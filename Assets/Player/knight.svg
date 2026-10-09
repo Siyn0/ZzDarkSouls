@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="48" viewBox="0 0 32 48" shape-rendering="crispEdges">
+  <!-- Temporary player art, facing right. The feet sit at y = 48. -->
+  <path fill="#753e4b" d="M9 19h12l2 23H3z"/>
+  <path fill="#a35960" d="M8 20h4L8 38H5z"/>
+  <path fill="#25313d" d="M10 35h7v13H8v-5h2zM19 35h6v9h3v4h-9z"/>
+  <path fill="#9daeb7" d="M10 21h14v15H10z"/>
+  <path fill="#617789" d="M10 24h5v12h-5zM15 32h9v4h-9z"/>
+  <path fill="#c6d0cf" d="M15 23h9v3h-9z"/>
+  <path fill="#617789" d="M8 8l5-4h9l5 5v13H8z"/>
+  <path fill="#c6d0cf" d="M13 5h8v6H10V9z"/>
+  <path fill="#9daeb7" d="M14 11h13v11H14z"/>
+  <path fill="#1d2c38" d="M17 12h11v4H17z"/>
+  <path fill="#e6c781" d="M22 13h5v2h-5z"/>
+  <path fill="#c6d0cf" d="M23 24h5v8h-5z"/>
+  <path fill="#495b6b" d="M23 32h5v5h-5z"/>
+</svg>
