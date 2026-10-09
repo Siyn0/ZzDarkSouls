@@ -1,0 +1,245 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/GameUI.gd" id="1_ui"]
+[ext_resource type="Theme" path="res://Assets/UI/MenuTheme.tres" id="2_theme"]
+
+[node name="GameUI" type="CanvasLayer"]
+process_mode = 3
+layer = 10
+script = ExtResource("1_ui")
+
+[node name="Screen" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_theme")
+
+[node name="Title" type="Label" parent="Screen"]
+offset_left = 40.0
+offset_top = 28.0
+offset_right = 500.0
+offset_bottom = 60.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 22
+text = "THE FIRST STEPS"
+
+[node name="Controls" type="Label" parent="Screen"]
+unique_name_in_owner = true
+offset_left = 40.0
+offset_top = 68.0
+offset_right = 800.0
+offset_bottom = 156.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.5, 0.61, 0.68, 1)
+theme_override_font_sizes/font_size = 14
+text = "移动与冲刺"
+autowrap_mode = 3
+
+[node name="SettingsButton" type="Button" parent="Screen"]
+unique_name_in_owner = true
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -152.0
+offset_top = 28.0
+offset_right = -40.0
+offset_bottom = 68.0
+grow_horizontal = 0
+focus_mode = 0
+text = "设置"
+
+[node name="StaminaLabel" type="Label" parent="Screen"]
+unique_name_in_owner = true
+offset_left = 40.0
+offset_top = 456.0
+offset_right = 310.0
+offset_bottom = 480.0
+theme_override_font_sizes/font_size = 14
+mouse_filter = 2
+text = "体力"
+
+[node name="Stamina" type="ProgressBar" parent="Screen"]
+unique_name_in_owner = true
+offset_left = 40.0
+offset_top = 486.0
+offset_right = 260.0
+offset_bottom = 496.0
+mouse_filter = 2
+max_value = 110.0
+value = 110.0
+show_percentage = false
+
+[node name="DashStatus" type="Label" parent="Screen"]
+unique_name_in_owner = true
+offset_left = 320.0
+offset_top = 464.0
+offset_right = 640.0
+offset_bottom = 496.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.5, 0.85, 1, 1)
+mouse_filter = 2
+text = "◆ 冲刺就绪"
+
+[node name="Overlay" type="Control" parent="Screen"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="Screen/Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.01, 0.02, 0.035, 0.78)
+
+[node name="Center" type="CenterContainer" parent="Screen/Overlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Panel" type="PanelContainer" parent="Screen/Overlay/Center"]
+custom_minimum_size = Vector2(760, 508)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Screen/Overlay/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="Content" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+layout_mode = 2
+
+[node name="PageTitle" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "设置"
+
+[node name="CloseButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "关闭"
+
+[node name="Separator" type="HSeparator" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+layout_mode = 2
+
+[node name="MainPage" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Description" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.65, 0.7, 1)
+text = "游戏已暂停，按自己的习惯调整操作。"
+
+[node name="OpenBindings" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+text = "键位设置    →"
+alignment = 0
+
+[node name="Spacer" type="Control" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="ResumeButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "继续游戏"
+
+[node name="BindingsPage" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="Help" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.65, 0.7, 1)
+theme_override_font_sizes/font_size = 13
+text = "点击按键后按下一个新键；Esc 取消。每个动作最多两个按键。"
+
+[node name="Columns" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Action" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+text = "动作"
+
+[node name="Primary" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns"]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "按键 1"
+horizontal_alignment = 1
+
+[node name="Secondary" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns"]
+custom_minimum_size = Vector2(132, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "按键 2"
+horizontal_alignment = 1
+
+[node name="Rows" type="GridContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 4
+columns = 3
+
+[node name="Status" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 13
+text = "修改后立即生效，并自动保存。"
+autowrap_mode = 3
+vertical_alignment = 1
+
+[node name="Footer" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "← 返回设置"
+
+[node name="Spacer" type="Control" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="RestoreButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "恢复默认"
