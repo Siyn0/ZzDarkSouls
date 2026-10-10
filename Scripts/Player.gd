@@ -61,6 +61,13 @@ extends CharacterBody2D
 @export var climb_jump_cost: float = 27.5
 @export var tired_threshold: float = 20.0
 
+@export_group("State Colors")
+## 冲刺次数用尽时的颜色，恢复次数后还原；持物限制不算次数耗尽。
+@export var dash_empty_color := Color(0.3, 0.65, 1.0)
+@export var tired_color := Color(1.0, 0.2, 0.2)
+## 低体力时每隔多少秒切换一次红色 / 当前状态色。
+@export_range(0.05, 0.5, 0.01) var tired_flash_interval: float = 0.1
+
 const AFTERIMAGE_INTERVAL: float = 0.025
 const AFTERIMAGE_LIFETIME: float = 0.28
 const GRAB_DISTANCE: float = 6.0
@@ -102,6 +109,7 @@ var _fall_speed_limit: float = 0.0
 var _afterimage_material := CanvasItemMaterial.new()
 var _standing_shape: Shape2D
 var _duck_shape: CapsuleShape2D
+var _tired_flash_elapsed: float = 0.0
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var _normal_modulate: Color = sprite.modulate
@@ -125,6 +133,23 @@ func _ready() -> void:
 
 func dash_available() -> bool:
 	return not _air_dash_used and _dash_cooldown_left <= 0.0 and not combat.carrying() and not combat.dead
+
+
+func _process(delta: float) -> void:
+	# 集中计算角色颜色，避免冲刺结束或受击打断时覆盖资源状态提示。
+	var tint := Color.WHITE
+	if _air_dash_used:
+		tint = dash_empty_color
+	if _dash_time_left > 0.0:
+		tint = Color(0.65, 1.0, 1.0)
+	if stamina < tired_threshold:
+		var interval := maxf(0.05, tired_flash_interval)
+		if _tired_flash_elapsed < interval:
+			tint = tired_color
+		_tired_flash_elapsed = fmod(_tired_flash_elapsed + delta, interval * 2.0)
+	else:
+		_tired_flash_elapsed = 0.0
+	sprite.modulate = _normal_modulate * tint
 
 
 func _physics_process(delta: float) -> void:
@@ -401,7 +426,6 @@ func _begin_dash() -> void:
 	_air_dash_used = true
 	_afterimage_time_left = AFTERIMAGE_INTERVAL
 	velocity = Vector2.ZERO
-	sprite.modulate = Color(0.65, 1.0, 1.0)
 	_spawn_afterimage()
 
 
@@ -548,7 +572,6 @@ func _end_dash() -> void:
 	if (is_on_floor() and velocity.y > 0.0) or (is_on_ceiling() and velocity.y < 0.0):
 		velocity.y = 0.0
 	_fall_speed_limit = max_fall_speed
-	sprite.modulate = _normal_modulate
 
 
 func _spawn_afterimage() -> void:

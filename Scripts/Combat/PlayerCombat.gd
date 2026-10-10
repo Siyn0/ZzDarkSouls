@@ -197,7 +197,6 @@ func _cancel_movement() -> void:
 	actor._wall_retention_left = 0
 	actor._jump_buffer_left = 0
 	actor.is_climbing = false
-	actor.sprite.modulate = actor._normal_modulate
 
 func _resolve(result: String, message: String, tint: Color) -> void:
 	last_result = result
