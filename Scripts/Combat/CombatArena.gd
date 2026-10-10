@@ -1,7 +1,8 @@
 ﻿extends Node2D
 
 const Tea := preload("res://Scripts/Combat/IcedTea.gd")
-const Enemy := preload("res://Scripts/Combat/TrainingEnemy.gd")
+const SmallEnemy := preload("res://Scenes/Enemies/SmallEnemy.tscn")
+const BossEnemy := preload("res://Scenes/Enemies/IronGuard.tscn")
 const Supplier := preload("res://Scripts/Combat/TeaSupplier.gd")
 var mode := "mobs"
 var player: CharacterBody2D
@@ -66,7 +67,6 @@ func _create_hud() -> void:
 	_boss_name = Label.new()
 	_boss_name.position = Vector2(270, 212)
 	_boss_name.size = Vector2(420, 22)
-	_boss_name.text = "铁罐守卫 · BOSS"
 	_boss_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_boss_name.add_theme_font_size_override("font_size", 14)
 	_boss_name.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -129,7 +129,7 @@ func reset_round() -> void:
 	if mode == "boss":
 		spawn_tea(Vector2(200, 398))
 	_spawn_enemy()
-	announce("牢大：冰红茶管够，先看准敌人的起手！" if mode == "mobs" else "补给航线已开启 · 击败铁罐守卫")
+	announce("牢大：冰红茶管够，等刀落下来再弹！" if mode == "mobs" else "补给航线已开启 · " + _boss_name.text)
 
 func spawn_tea(at: Vector2) -> Node2D:
 	var bottles: Array[Node] = get_tree().get_nodes_in_group("tea_bottles")
@@ -147,22 +147,23 @@ func spawn_tea(at: Vector2) -> Node2D:
 	return tea
 
 func _spawn_enemy() -> void:
-	var enemy := Enemy.new()
-	enemy.boss = mode == "boss"
+	var enemy := (BossEnemy if mode == "boss" else SmallEnemy).instantiate()
 	enemy.position = Vector2(700 if enemy.boss else 580, 414)
 	enemy.target = player
 	enemy.defeated.connect(_on_enemy_defeated)
 	add_child(enemy)
+	if enemy.boss:
+		_boss_name.text = enemy.display_name + " · BOSS"
 
-func _on_enemy_defeated(_enemy: Node) -> void:
+func _on_enemy_defeated(enemy: Node) -> void:
 	if mode == "boss":
 		completed = true
 		supplier.active = false
 		supplier.hide()
-		announce("铁罐守卫击败！牢大：下一瓶算我的。", 1000)
+		announce("%s击败！牢大：下一瓶算我的。" % enemy.display_name, 1000)
 	else:
 		_respawn_left = 3.0
-		announce("小怪击败！3 秒后再来一只；牢大继续补货。", 3.0)
+		announce("%s击败！3 秒后再来一只；牢大继续补货。" % enemy.display_name, 3.0)
 
 func _on_player_died() -> void:
 	_respawn_left = 0
@@ -176,7 +177,7 @@ func announce(message: String, duration: float = 2.5) -> void:
 func _physics_process(delta: float) -> void:
 	_message_left = maxf(0, _message_left - delta)
 	if _message_left == 0 and not player.combat.dead and not completed:
-		_banner.text = "看起手 → 防御 / 精准防御 → 冰红茶反击"
+		_banner.text = "观察挥刀 → 命中前防御 / 精准防御 → 冰红茶反击"
 	if _respawn_left > 0 and not player.combat.dead:
 		_respawn_left -= delta
 		if _respawn_left <= 0:

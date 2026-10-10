@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/TrainingEnemy.gd" id="1_enemy"]
+
+[sub_resource type="RectangleShape2D" id="Shape_enemy"]
+resource_local_to_scene = true
+size = Vector2(26, 42)
+
+[node name="SmallEnemy" type="CharacterBody2D" groups=["enemies"]]
+z_index = 2
+texture_filter = 1
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_enemy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -21)
+shape = SubResource("Shape_enemy")
+
+[node name="NameLabel" type="Label" parent="."]
+offset_left = -90.0
+offset_top = -96.0
+offset_right = 90.0
+offset_bottom = -76.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.06, 0.08, 0.1, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 12
+text = "持刀小怪"
+horizontal_alignment = 1

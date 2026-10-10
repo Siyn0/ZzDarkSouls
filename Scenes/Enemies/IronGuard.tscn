@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Enemies/SmallEnemy.tscn" id="1_enemy"]
+
+[node name="IronGuard" instance=ExtResource("1_enemy")]
+display_name = "铁罐守卫"
+boss = true
+body_color = Color(0.5686275, 0.29411766, 0.32941177, 1)
+body_size = Vector2(40, 72)
+max_health = 300
+attack_damage = 25
+max_posture = 100.0
+move_speed = 78.0
+detection_range = 800.0
+attack_range = 105.0
+windup_duration = 0.8
+swing_duration = 0.34
+recovery_duration = 0.85
+sword_length = 110.0
+sword_width = 5.0

@@ -2,7 +2,8 @@
 extends "res://Tests/MovementChecks.gd"
 
 const Tea := preload("res://Scripts/Combat/IcedTea.gd")
-const Enemy := preload("res://Scripts/Combat/TrainingEnemy.gd")
+const Enemy := preload("res://Scenes/Enemies/SmallEnemy.tscn")
+const Boss := preload("res://Scenes/Enemies/IronGuard.tscn")
 
 func bottle(at: Vector2) -> CharacterBody2D:
 	var tea := Tea.new()
@@ -11,9 +12,8 @@ func bottle(at: Vector2) -> CharacterBody2D:
 	return tea
 
 func enemy_at(at: Vector2, boss: bool = false) -> CharacterBody2D:
-	var enemy := Enemy.new()
+	var enemy := (Boss if boss else Enemy).instantiate()
 	enemy.position = at
-	enemy.boss = boss
 	enemy.target = player
 	enemy.attacks_enabled = false
 	world.add_child(enemy)

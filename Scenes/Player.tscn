@@ -8,7 +8,7 @@
 radius = 10.0
 height = 40.0
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" groups=["player"]]
 z_index = 2
 texture_filter = 1
 collision_layer = 2
