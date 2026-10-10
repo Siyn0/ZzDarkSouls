@@ -1,4 +1,4 @@
-﻿extends CharacterBody2D
+extends CharacterBody2D
 
 # 参考 Celeste Player 的 Normal / Dash / Climb；空间参数约放大三倍，时间保持原比例。
 # 使用 Godot 的胶囊碰撞与连续坐标，并非 Celeste 的逐像素碰撞实现。
@@ -108,6 +108,7 @@ var _duck_shape: CapsuleShape2D
 @onready var _body_shape: CollisionShape2D = $CollisionShape2D
 @onready var _standing_offset: Vector2 = _body_shape.position
 @onready var _sprite_offset: Vector2 = sprite.position
+@onready var combat: Node2D = $Combat
 
 
 func _ready() -> void:
@@ -123,14 +124,16 @@ func _ready() -> void:
 
 
 func dash_available() -> bool:
-	return not _air_dash_used and _dash_cooldown_left <= 0.0
+	return not _air_dash_used and _dash_cooldown_left <= 0.0 and not combat.carrying() and not combat.dead
 
 
 func _physics_process(delta: float) -> void:
+	if not combat.tick(delta):
+		return
 	# 起手停顿不推进玩家的动作窗口；停顿中按下的跳跃/冲刺仍会缓存。
 	if Input.is_action_just_pressed("jump"):
 		_jump_buffer_left = jump_buffer_time
-	if Input.is_action_just_pressed("dash"):
+	if Input.is_action_just_pressed("dash") and not combat.carrying():
 		_dash_buffer_left = dash_buffer_time
 	if _dash_pause_left > 0.0:
 		var frozen := minf(delta, _dash_pause_left)
@@ -167,7 +170,7 @@ func _physics_process(delta: float) -> void:
 	if is_climbing:
 		_update_climb(delta, horizontal, grounded)
 		return
-	if Input.is_action_pressed("grab") and not is_ducking and stamina >= tired_threshold and _regrab_lock <= 0.0 and velocity.y >= 0.0 and signf(velocity.x) != -_facing and _wall_at(_facing, GRAB_DISTANCE):
+	if KeyBindings.is_grabbing() and not combat.carrying() and not combat.guarding and not is_ducking and stamina >= tired_threshold and _regrab_lock <= 0.0 and velocity.y >= 0.0 and signf(velocity.x) != -_facing and _wall_at(_facing, GRAB_DISTANCE):
 		_begin_climb()
 		_update_climb(delta, horizontal, grounded)
 		return
@@ -207,12 +210,13 @@ func _update_normal(delta: float, horizontal: float, grounded: bool) -> void:
 	if _force_move_left > 0.0:
 		horizontal = _force_move_direction
 	var acceleration := run_acceleration
-	if absf(velocity.x) > move_speed and signf(velocity.x) == horizontal:
+	var speed_limit: float = move_speed * combat.movement_factor()
+	if absf(velocity.x) > speed_limit and signf(velocity.x) == horizontal:
 		acceleration = run_reduction
 	if is_ducking and grounded:
 		velocity.x = move_toward(velocity.x, 0.0, 1500.0 * delta)
 	else:
-		velocity.x = move_toward(velocity.x, horizontal * move_speed, acceleration * (1.0 if grounded else air_control) * delta)
+		velocity.x = move_toward(velocity.x, horizontal * speed_limit, acceleration * (1.0 if grounded else air_control) * delta)
 	if not grounded:
 		_update_fall(delta, horizontal)
 		if _variable_jump_left > 0.0:
@@ -229,9 +233,9 @@ func _update_normal(delta: float, horizontal: float, grounded: bool) -> void:
 			velocity.x += horizontal * jump_horizontal_boost
 			_start_jump(jump_speed)
 		else:
-			var side := _jump_wall_side()
+			var side := 0.0 if combat.carrying() else _jump_wall_side()
 			if side != 0.0:
-				if side == _facing and Input.is_action_pressed("grab") and stamina > 0.0:
+				if side == _facing and KeyBindings.is_grabbing() and stamina > 0.0:
 					_climb_jump(horizontal, grounded)
 				else:
 					_wall_jump(-side, _dash_attack_left > 0.0 and _dash_direction == Vector2.UP)
@@ -248,8 +252,8 @@ func _update_fall(delta: float, horizontal: float) -> void:
 	_fall_speed_limit = move_toward(_fall_speed_limit, target_limit, fast_fall_acceleration * delta)
 	var limit := _fall_speed_limit
 	# 不抓墙也可朝墙缓滑；缓滑效果逐渐减弱，不能无限挂墙。
-	var toward_wall := horizontal == _facing or (horizontal == 0.0 and Input.is_action_pressed("grab"))
-	if toward_wall and not Input.is_action_pressed("aim_down") and velocity.y >= 0.0 and stamina > 0.0 and _wall_slide_left > 0.0 and _wall_at(_facing, GRAB_DISTANCE):
+	var toward_wall := horizontal == _facing or (horizontal == 0.0 and KeyBindings.is_grabbing())
+	if toward_wall and not combat.carrying() and not Input.is_action_pressed("aim_down") and velocity.y >= 0.0 and stamina > 0.0 and _wall_slide_left > 0.0 and _wall_at(_facing, GRAB_DISTANCE):
 		limit = minf(limit, lerpf(max_fall_speed, wall_slide_start_speed, _wall_slide_left / maxf(0.001, wall_slide_time)))
 		_wall_slide_left = maxf(0.0, _wall_slide_left - delta)
 	var acceleration := get_gravity().y * gravity_scale
@@ -328,7 +332,7 @@ func _begin_climb() -> void:
 
 
 func _update_climb(delta: float, horizontal: float, grounded: bool) -> void:
-	if not Input.is_action_pressed("grab") or stamina <= 0.0:
+	if not KeyBindings.is_grabbing() or stamina <= 0.0:
 		is_climbing = false
 		_regrab_lock = 0.1
 		_update_normal(delta, horizontal, grounded)
@@ -368,6 +372,8 @@ func _update_climb(delta: float, horizontal: float, grounded: bool) -> void:
 
 
 func _begin_dash() -> void:
+	combat.guarding = false
+	combat.perfect_left = 0
 	_dash_buffer_left = 0.0
 	_wall_boost_left = 0.0
 	_wall_retention_left = 0.0

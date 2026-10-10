@@ -19,6 +19,13 @@ func _ready() -> void:
 	%OpenBindings.pressed.connect(show_bindings)
 	%BackButton.pressed.connect(show_main_page)
 	%RestoreButton.pressed.connect(_restore_defaults)
+	%GrabMode.add_item("按住抓取（默认）")
+	%GrabMode.add_item("按一下切换")
+	%GrabMode.item_selected.connect(_change_grab_mode)
+	%ArenaButton.pressed.connect(_switch_arena)
+	%ArenaButton.text = "返回练习场" if get_parent().has_method("is_combat_arena") else "战斗试验场"
+	if get_parent().has_method("is_combat_arena"):
+		$Screen/Title.text = "ICED TEA / 冰红茶试验场"
 	for action: String in KeyBindings.ACTION_LABELS:
 		var label := Label.new()
 		label.text = KeyBindings.ACTION_LABELS[action]
@@ -42,7 +49,12 @@ func _process(_delta: float) -> void:
 	var tired: bool = player.stamina < player.tired_threshold
 	%Stamina.modulate = Color(1.0, 0.45, 0.3) if tired else Color(0.5, 0.9, 0.8)
 	%StaminaLabel.text = "体力  %d / %d%s" % [ceili(maxf(0.0, player.stamina)), ceili(player.max_stamina), "  · 即将力竭" if tired else ""]
-	%DashStatus.text = "◆ 冲刺就绪" if player.dash_available() else "◇ 冲刺恢复中" if player.is_on_floor() else "◇ 落地恢复冲刺"
+	%DashStatus.text = "◇ 放下冰红茶才能冲刺" if player.combat.carrying() else "◆ 冲刺就绪" if player.dash_available() else "◇ 冲刺恢复中" if player.is_on_floor() else "◇ 落地恢复冲刺"
+
+
+func _switch_arena() -> void:
+	KeyBindings.release_gameplay_inputs()
+	get_tree().change_scene_to_file("res://Scenes/World.tscn" if get_parent().has_method("is_combat_arena") else "res://Scenes/CombatArena.tscn")
 
 
 func _input(event: InputEvent) -> void:
@@ -137,6 +149,7 @@ func _restore_defaults() -> void:
 
 
 func _refresh_bindings() -> void:
+	%GrabMode.select(1 if KeyBindings.grab_mode == "toggle" else 0)
 	for action: String in _binding_buttons:
 		for slot in range(2):
 			var button: Button = _binding_buttons[action][slot]
@@ -147,6 +160,23 @@ func _refresh_bindings() -> void:
 		KeyBindings.action_label("grab"), KeyBindings.action_label("aim_up"),
 		KeyBindings.action_label("aim_down"),
 	]
+	if KeyBindings.grab_mode == "toggle":
+		%Controls.text = %Controls.text.replace("按住 %s 抓墙" % KeyBindings.action_label("grab"), "按 %s 切换抓墙" % KeyBindings.action_label("grab"))
+	if get_parent().has_method("is_combat_arena"):
+		var grab_hint := "按 %s 切换抓取 / 松手；松手时按向下则放下" if KeyBindings.grab_mode == "toggle" else "按住 %s 抓墙 / 抓冰红茶；松开投掷，向下 + 松开放下"
+		%Controls.text = "移动 %s · %s    跳跃 %s    冲刺 %s\n%s\n按住 %s 防御；看刀刃落到身上时按下：精准防御\n抱着冰红茶可以跳跃；先抛出再冲刺 / 抓墙。右下角切换小怪与 Boss 战。" % [
+			KeyBindings.action_label("move_left"), KeyBindings.action_label("move_right"),
+			KeyBindings.action_label("jump"), KeyBindings.action_label("dash"),
+			grab_hint % KeyBindings.action_label("grab"),
+			KeyBindings.action_label("defend"),
+		]
+
+
+func _change_grab_mode(index: int) -> void:
+	var error := KeyBindings.set_grab_mode("toggle" if index == 1 else "hold")
+	%GrabModeStatus.text = "抓取方式已保存，抓墙与冰红茶共用。" if error.is_empty() else error
+	%GrabModeStatus.modulate = Color(0.55, 0.84, 0.86) if error.is_empty() else Color(1.0, 0.68, 0.58)
+	%GrabMode.select(1 if KeyBindings.grab_mode == "toggle" else 0)
 
 
 func _set_status(message: String, is_error: bool = false) -> void:

@@ -23,7 +23,7 @@ tile_set = ExtResource("1_tiles")
 
 [node name="Player" parent="." unique_id=113579767 instance=ExtResource("2_player")]
 position = Vector2(160, 352)
-jump_speed = 320.0
-gravity_scale = 2.94
+jump_speed = 300.0
+gravity_scale = 3.15
 
 [node name="GameUI" parent="." unique_id=1309507838 instance=ExtResource("3_ui")]

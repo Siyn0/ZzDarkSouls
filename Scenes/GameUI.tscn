@@ -52,6 +52,19 @@ grow_horizontal = 0
 focus_mode = 0
 text = "设置"
 
+[node name="ArenaButton" type="Button" parent="Screen"]
+unique_name_in_owner = true
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -324.0
+offset_top = 28.0
+offset_right = -168.0
+offset_bottom = 68.0
+grow_horizontal = 0
+focus_mode = 0
+text = "战斗试验场"
+
 [node name="StaminaLabel" type="Label" parent="Screen"]
 unique_name_in_owner = true
 offset_left = 40.0
@@ -159,6 +172,31 @@ layout_mode = 2
 text = "键位设置    →"
 alignment = 0
 
+[node name="GrabBehavior" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage/GrabBehavior"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "抓取方式（墙壁 / 冰红茶）"
+
+[node name="GrabMode" type="OptionButton" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage/GrabBehavior"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 40)
+layout_mode = 2
+
+[node name="GrabHelp" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.5, 0.65, 0.7, 1)
+text = "按住：持续按住抓取，松开投掷。\n切换：按一次抓取，再按一次松手。\n松手时按住向下会轻放冰红茶；两种方式都共用抓墙键。"
+
+[node name="GrabModeStatus" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "修改后自动保存。"
+
 [node name="Spacer" type="Control" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -207,9 +245,17 @@ theme_override_font_sizes/font_size = 13
 text = "按键 2"
 horizontal_alignment = 1
 
-[node name="Rows" type="GridContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+[node name="Scroll" type="ScrollContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="Rows" type="GridContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Scroll"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 4
 columns = 3

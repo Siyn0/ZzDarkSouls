@@ -10,13 +10,31 @@ const ACTION_LABELS: Dictionary = {
 	"aim_down": "向下（冲刺 / 攀爬 / 快落）",
 	"jump": "跳跃",
 	"dash": "冲刺",
-	"grab": "抓墙（按住）",
+	"grab": "抓取（墙壁 / 冰红茶）",
+	"defend": "防御 / 精准防御",
 }
 
 var load_message: String = ""
 var _config_path: String = "user://keybindings.cfg"
 var _defaults: Dictionary = {}
 var _bindings: Dictionary = {}
+var grab_mode: String = "hold"
+var input_reset_serial: int = 0
+var _grab_latched: bool = false
+
+
+func _physics_process(_delta: float) -> void:
+	if grab_mode == "toggle" and Input.is_action_just_pressed("grab"):
+		_grab_latched = not _grab_latched
+
+
+func is_grabbing() -> bool:
+	return _grab_latched if grab_mode == "toggle" else Input.is_action_pressed("grab")
+
+
+func resume_carried_grab() -> void:
+	if grab_mode == "toggle":
+		_grab_latched = not Input.is_action_just_pressed("grab")
 
 
 func _ready() -> void:
@@ -34,20 +52,28 @@ func load_bindings() -> void:
 	var config := ConfigFile.new()
 	var candidate := _defaults.duplicate(true)
 	load_message = ""
+	grab_mode = "hold"
 	var error := config.load(_config_path)
 	if error == OK:
+		var saved_mode: Variant = config.get_value("controls", "grab_mode", "hold")
+		if saved_mode is String and saved_mode in ["hold", "toggle"]:
+			grab_mode = saved_mode
 		for action: String in ACTION_LABELS:
 			candidate[action] = config.get_value("keys", action, _defaults[action])
-		# 旧存档没有抓墙键。若 Ctrl 已被用户使用，为新增动作选一个空闲键，
-		# 避免一次功能升级把用户的整套自定义键位重置。
-		if not config.has_section_key("keys", "grab"):
-			var used: Array = []
-			for action: String in ACTION_LABELS:
-				if action != "grab" and candidate[action] is Array:
-					used.append_array(candidate[action])
-			for code: int in [KEY_CTRL, KEY_C, KEY_E, KEY_G, KEY_F, KEY_V, KEY_B, KEY_N, KEY_M, KEY_Q, KEY_R, KEY_T, KEY_Y, KEY_U]:
-				if code not in used:
-					candidate["grab"] = [code, 0]
+		# 只迁移后续新增的动作；基础移动配置缺损仍按原有校验恢复。
+		var added_actions := ["grab", "defend"]
+		var used: Array = []
+		for action: String in ACTION_LABELS:
+			if (config.has_section_key("keys", action) or action not in added_actions) and candidate[action] is Array:
+				used.append_array(candidate[action])
+		for action: String in ACTION_LABELS:
+			if config.has_section_key("keys", action) or action not in added_actions:
+				continue
+			var choices: Array = [_defaults[action][0], KEY_CTRL, KEY_C, KEY_E, KEY_F, KEY_G, KEY_V, KEY_B, KEY_N, KEY_M, KEY_Q, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_H, KEY_J, KEY_K, KEY_L]
+			for code: int in choices:
+				if code != 0 and code not in used:
+					candidate[action] = [code, 0]
+					used.append(code)
 					break
 		if not _is_valid(candidate):
 			candidate = _defaults.duplicate(true)
@@ -102,18 +128,29 @@ func restore_defaults() -> String:
 	return _save_and_apply(_defaults.duplicate(true))
 
 
+func set_grab_mode(mode: String) -> String:
+	if mode not in ["hold", "toggle"]:
+		return "无效的抓取方式。"
+	return _save_and_apply(_bindings.duplicate(true), mode)
+
+
 func release_gameplay_inputs() -> void:
+	_grab_latched = false
+	input_reset_serial += 1
 	for action: String in ACTION_LABELS:
 		Input.action_release(action)
 
 
-func _save_and_apply(candidate: Dictionary) -> String:
+func _save_and_apply(candidate: Dictionary, mode: String = "") -> String:
 	var config := ConfigFile.new()
+	var next_mode := grab_mode if mode.is_empty() else mode
+	config.set_value("controls", "grab_mode", next_mode)
 	for action: String in ACTION_LABELS:
 		config.set_value("keys", action, candidate[action])
 	if config.save(_config_path) != OK:
 		return "保存失败，键位未更改。请检查用户目录是否可写。"
 	load_message = ""
+	grab_mode = next_mode
 	_apply(candidate)
 	return ""
 

@@ -47,8 +47,8 @@ func solid(body_name: String, at: Vector2, size: Vector2) -> void:
 	world.add_child(body)
 
 func reset_stage(at: Vector2 = Vector2(0, 600), wall_side: float = 0.0) -> void:
-	for action in ["move_left", "move_right", "aim_up", "aim_down", "jump", "dash", "grab"]:
-		release(action)
+	root.get_node("KeyBindings").grab_mode = "hold"
+	root.get_node("KeyBindings").release_gameplay_inputs()
 	if is_instance_valid(world):
 		world.free()
 	world = Node2D.new()
