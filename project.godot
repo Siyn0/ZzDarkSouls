@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="ZZDarkSouls"
-run/main_scene="res://Scenes/World.tscn"
+run/main_scene="uid://dmkukw54r8dhd"
 config/features=PackedStringArray("4.7", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://dwehjvkws6t87"
 
 [autoload]
 

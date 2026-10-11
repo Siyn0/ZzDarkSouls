@@ -1,14 +1,49 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://b5jx7dsfsgnvv"]
 
-[ext_resource type="Script" path="res://Scripts/GameUI.gd" id="1_ui"]
-[ext_resource type="Theme" path="res://Assets/UI/MenuTheme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://bnhmyf88dgdqy" path="res://Scripts/GameUI.gd" id="1_ui"]
+[ext_resource type="Theme" uid="uid://psoy22raik6q" path="res://Assets/UI/MenuTheme.tres" id="2_theme"]
+[ext_resource type="Texture2D" uid="uid://b2opgu0a30lcw" path="res://Assets/UI/ember_sigil.svg" id="6_sigil"]
+[ext_resource type="Texture2D" uid="uid://c7c125cfgbg6v" path="res://Assets/UI/hint_banner.svg" id="7_hint"]
 
-[node name="GameUI" type="CanvasLayer"]
+[sub_resource type="StyleBoxFlat" id="Style_track"]
+bg_color = Color(0.1, 0.13, 0.15, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="Style_health"]
+bg_color = Color(0.78, 0.24, 0.27, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="Style_stamina"]
+bg_color = Color(0.33, 0.75, 0.47, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxTexture" id="Style_hint"]
+content_margin_left = 54.0
+content_margin_top = 20.0
+content_margin_right = 54.0
+content_margin_bottom = 20.0
+texture = ExtResource("7_hint")
+texture_margin_left = 80.0
+texture_margin_top = 18.0
+texture_margin_right = 80.0
+texture_margin_bottom = 18.0
+
+[node name="GameUI" type="CanvasLayer" unique_id=333633466 groups=["game_hud"]]
 process_mode = 3
 layer = 10
 script = ExtResource("1_ui")
 
-[node name="Screen" type="Control" parent="."]
+[node name="Screen" type="Control" parent="." unique_id=1993090034]
+texture_filter = 2
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,86 +53,111 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_theme")
 
-[node name="Title" type="Label" parent="Screen"]
-offset_left = 40.0
-offset_top = 28.0
-offset_right = 500.0
-offset_bottom = 60.0
+[node name="Vitals" type="Control" parent="Screen" unique_id=2003677933]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 22.0
+offset_top = 22.0
+offset_right = 455.0
+offset_bottom = 108.0
 mouse_filter = 2
-theme_override_font_sizes/font_size = 22
-text = "THE FIRST STEPS"
 
-[node name="Controls" type="Label" parent="Screen"]
-unique_name_in_owner = true
-offset_left = 40.0
-offset_top = 68.0
-offset_right = 800.0
-offset_bottom = 156.0
+[node name="Sigil" type="TextureRect" parent="Screen/Vitals" unique_id=2104317430]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
 mouse_filter = 2
-theme_override_colors/font_color = Color(0.5, 0.61, 0.68, 1)
-theme_override_font_sizes/font_size = 14
-text = "移动与冲刺"
-autowrap_mode = 3
+texture = ExtResource("6_sigil")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="SettingsButton" type="Button" parent="Screen"]
+[node name="Health" type="ProgressBar" parent="Screen/Vitals" unique_id=1629198449]
 unique_name_in_owner = true
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -152.0
-offset_top = 28.0
-offset_right = -40.0
-offset_bottom = 68.0
-grow_horizontal = 0
-focus_mode = 0
-text = "设置"
-
-[node name="ArenaButton" type="Button" parent="Screen"]
-unique_name_in_owner = true
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -324.0
-offset_top = 28.0
-offset_right = -168.0
-offset_bottom = 68.0
-grow_horizontal = 0
-focus_mode = 0
-text = "战斗试验场"
-
-[node name="StaminaLabel" type="Label" parent="Screen"]
-unique_name_in_owner = true
-offset_left = 40.0
-offset_top = 456.0
-offset_right = 310.0
-offset_bottom = 480.0
-theme_override_font_sizes/font_size = 14
+layout_mode = 0
+offset_left = 66.0
+offset_top = 10.0
+offset_right = 366.0
+offset_bottom = 28.0
 mouse_filter = 2
-text = "体力"
+theme_override_styles/background = SubResource("Style_track")
+theme_override_styles/fill = SubResource("Style_health")
+value = 100.0
+show_percentage = false
 
-[node name="Stamina" type="ProgressBar" parent="Screen"]
+[node name="Stamina" type="ProgressBar" parent="Screen/Vitals" unique_id=1251105896]
 unique_name_in_owner = true
-offset_left = 40.0
-offset_top = 486.0
-offset_right = 260.0
-offset_bottom = 496.0
+layout_mode = 0
+offset_left = 66.0
+offset_top = 32.0
+offset_right = 268.0
+offset_bottom = 48.0
 mouse_filter = 2
+theme_override_styles/background = SubResource("Style_track")
+theme_override_styles/fill = SubResource("Style_stamina")
 max_value = 110.0
+step = 0.0
 value = 110.0
 show_percentage = false
 
-[node name="DashStatus" type="Label" parent="Screen"]
+[node name="HealthLabel" type="Label" parent="Screen/Vitals" unique_id=2083833639]
 unique_name_in_owner = true
-offset_left = 320.0
-offset_top = 464.0
-offset_right = 640.0
-offset_bottom = 496.0
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.5, 0.85, 1, 1)
-mouse_filter = 2
-text = "◆ 冲刺就绪"
+visible = false
+layout_mode = 0
+offset_left = 374.0
+offset_top = 9.0
+offset_right = 520.0
+offset_bottom = 28.0
+theme_override_font_sizes/font_size = 12
+text = "生命  100 / 100"
 
-[node name="Overlay" type="Control" parent="Screen"]
+[node name="StaminaLabel" type="Label" parent="Screen/Vitals" unique_id=1204494180]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 276.0
+offset_top = 31.0
+offset_right = 485.0
+offset_bottom = 49.0
+theme_override_font_sizes/font_size = 12
+text = "体力  110 / 110"
+
+[node name="PauseHint" type="Label" parent="Screen" unique_id=1770317976]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 48.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.57, 0.55, 0.47, 1)
+theme_override_font_sizes/font_size = 13
+text = "Esc  设置"
+horizontal_alignment = 2
+
+[node name="RegionHint" type="PanelContainer" parent="Screen" unique_id=1229060596]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -310.0
+offset_top = 118.0
+offset_right = 310.0
+offset_bottom = 196.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Style_hint")
+
+[node name="HintText" type="Label" parent="Screen/RegionHint" unique_id=323889656]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.83, 0.8, 0.69, 1)
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Overlay" type="Control" parent="Screen" unique_id=368880335]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -107,152 +167,158 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Dim" type="ColorRect" parent="Screen/Overlay"]
+[node name="Dim" type="ColorRect" parent="Screen/Overlay" unique_id=1830356842]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-color = Color(0.01, 0.02, 0.035, 0.78)
+color = Color(0.015, 0.014, 0.011, 0.8)
 
-[node name="Center" type="CenterContainer" parent="Screen/Overlay"]
+[node name="Center" type="CenterContainer" parent="Screen/Overlay" unique_id=622507872]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Panel" type="PanelContainer" parent="Screen/Overlay/Center"]
+[node name="Panel" type="PanelContainer" parent="Screen/Overlay/Center" unique_id=1831047736]
 custom_minimum_size = Vector2(760, 508)
 layout_mode = 2
 
-[node name="Margin" type="MarginContainer" parent="Screen/Overlay/Center/Panel"]
+[node name="Margin" type="MarginContainer" parent="Screen/Overlay/Center/Panel" unique_id=821995373]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 20
 
-[node name="Content" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin"]
+[node name="Content" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin" unique_id=595303310]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Header" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+[node name="Header" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content" unique_id=1177342976]
 layout_mode = 2
 
-[node name="PageTitle" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/Header"]
+[node name="PageTitle" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/Header" unique_id=692956897]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 text = "设置"
 
-[node name="CloseButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Header"]
+[node name="CloseButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Header" unique_id=2046754977]
 unique_name_in_owner = true
 layout_mode = 2
 text = "关闭"
 
-[node name="Separator" type="HSeparator" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+[node name="Separator" type="HSeparator" parent="Screen/Overlay/Center/Panel/Margin/Content" unique_id=2071526985]
 layout_mode = 2
 
-[node name="MainPage" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+[node name="MainPage" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content" unique_id=1289402853]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 16
 
-[node name="Description" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+[node name="Description" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage" unique_id=315676332]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.65, 0.7, 1)
+theme_override_colors/font_color = Color(0.63, 0.6, 0.51, 1)
 text = "游戏已暂停，按自己的习惯调整操作。"
 
-[node name="OpenBindings" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+[node name="OpenBindings" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage" unique_id=1500922321]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 54)
 layout_mode = 2
-text = "键位设置    →"
+text = "键位设置"
 alignment = 0
 
-[node name="GrabBehavior" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+[node name="GrabBehavior" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage" unique_id=1820964135]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage/GrabBehavior"]
+[node name="Label" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage/GrabBehavior" unique_id=216465394]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "抓取方式（墙壁 / 冰红茶）"
 
-[node name="GrabMode" type="OptionButton" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage/GrabBehavior"]
+[node name="GrabMode" type="OptionButton" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage/GrabBehavior" unique_id=163437246]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(250, 40)
 layout_mode = 2
 
-[node name="GrabHelp" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+[node name="GrabHelp" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage" unique_id=1290382706]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.63, 0.6, 0.51, 1)
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.5, 0.65, 0.7, 1)
-text = "按住：持续按住抓取，松开投掷。\n切换：按一次抓取，再按一次松手。\n松手时按住向下会轻放冰红茶；两种方式都共用抓墙键。"
+text = "按住：持续按住抓取，松开投掷。
+切换：按一次抓取，再按一次松手。
+松手时按住向下会轻放冰红茶；两种方式都共用抓墙键。"
 
-[node name="GrabModeStatus" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+[node name="GrabModeStatus" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage" unique_id=11615750]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "修改后自动保存。"
 
-[node name="Spacer" type="Control" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+[node name="Spacer" type="Control" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage" unique_id=57784789]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="ResumeButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage"]
+[node name="ResumeButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/MainPage" unique_id=1986578687]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "继续游戏"
 
-[node name="BindingsPage" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+[node name="BindingsPage" type="VBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content" unique_id=1581753120]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 6
 
-[node name="Help" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+[node name="Help" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage" unique_id=867124137]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.65, 0.7, 1)
+theme_override_colors/font_color = Color(0.63, 0.6, 0.51, 1)
 theme_override_font_sizes/font_size = 13
 text = "点击按键后按下一个新键；Esc 取消。每个动作最多两个按键。"
 
-[node name="Columns" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+[node name="Columns" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage" unique_id=2094732253]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Action" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns"]
+[node name="Action" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns" unique_id=713312681]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 13
 text = "动作"
 
-[node name="Primary" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns"]
+[node name="Primary" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns" unique_id=1851887136]
 custom_minimum_size = Vector2(132, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "按键 1"
 horizontal_alignment = 1
 
-[node name="Secondary" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns"]
+[node name="Secondary" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Columns" unique_id=1032337101]
 custom_minimum_size = Vector2(132, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 text = "按键 2"
 horizontal_alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+[node name="Scroll" type="ScrollContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage" unique_id=1375200793]
 custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
 follow_focus = true
+horizontal_scroll_mode = 0
 
-[node name="Rows" type="GridContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Scroll"]
+[node name="Rows" type="GridContainer" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage/Scroll" unique_id=989277538]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -260,31 +326,37 @@ theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 4
 columns = 3
 
-[node name="Status" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage"]
+[node name="Status" type="Label" parent="Screen/Overlay/Center/Panel/Margin/Content/BindingsPage" unique_id=1898874520]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 13
 text = "修改后立即生效，并自动保存。"
-autowrap_mode = 3
 vertical_alignment = 1
+autowrap_mode = 3
 
-[node name="Footer" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content"]
+[node name="Footer" type="HBoxContainer" parent="Screen/Overlay/Center/Panel/Margin/Content" unique_id=73371731]
 layout_mode = 2
 
-[node name="BackButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer"]
+[node name="ArenaButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer" unique_id=1918614101]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "战斗试验场"
+
+[node name="BackButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer" unique_id=597351325]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "← 返回设置"
 
-[node name="Spacer" type="Control" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer"]
+[node name="Spacer" type="Control" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer" unique_id=915799796]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="RestoreButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer"]
+[node name="RestoreButton" type="Button" parent="Screen/Overlay/Center/Panel/Margin/Content/Footer" unique_id=457644000]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/TextHintArea.gd" id="1_hint"]
+
+[sub_resource type="RectangleShape2D" id="Shape_region"]
+resource_local_to_scene = true
+size = Vector2(240, 160)
+
+[node name="TextHintArea" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_hint")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("Shape_region")

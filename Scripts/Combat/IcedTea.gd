@@ -3,13 +3,17 @@
 @export var damage: int = 30
 @export var throw_speed: float = 720.0
 @export var gravity: float = 1200.0
+## 从最后出瓶 / 持有位置向下掉出多远后回收；零表示禁用。
+@export var fall_cleanup_distance: float = 2000.0
 var holder: Node2D
 var armed := false
 var pickup_lock := 0.0
 var armed_left := 0.0
 var age := 0.0
+var _fall_origin_y := 0.0
 
 func _ready() -> void:
+	_fall_origin_y = global_position.y
 	add_to_group("tea_bottles")
 	collision_layer = 0
 	collision_mask = 1
@@ -36,6 +40,7 @@ func pick_up(who: Node2D) -> void:
 func follow_holder() -> void:
 	if is_instance_valid(holder):
 		global_position = holder.global_position + Vector2(holder.get("_facing") * 20, -25)
+		_fall_origin_y = global_position.y
 		rotation = 0.0
 
 func release_from_hand(direction: float, inherited: Vector2, drop: bool) -> void:
@@ -79,7 +84,7 @@ func _physics_process(delta: float) -> void:
 			if absf(velocity.y) < 45:
 				velocity.y = 0
 	rotation = move_toward(rotation, 0, delta * 8) if not armed else rotation + delta * velocity.x * 0.006
-	if global_position.y > 900 or absf(global_position.x) > 2500:
+	if fall_cleanup_distance > 0 and global_position.y > _fall_origin_y + fall_cleanup_distance:
 		queue_free()
 
 func _draw() -> void:

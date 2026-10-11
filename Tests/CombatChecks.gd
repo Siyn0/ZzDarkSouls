@@ -176,7 +176,8 @@ func run_checks() -> void:
 	player.combat.health = 1
 	world.reset_round()
 	player = world.player
-	await frames(1)
+	# 新供应者等待 Area2D 完成玩家进入检测，再创建第一瓶。
+	await frames(5)
 	check(player.get_instance_id() != old_player and player.combat.health == 100, "Retry restores player state without stale references")
 	check(get_nodes_in_group("enemies").size() == 1 and get_nodes_in_group("tea_bottles").size() == 1, "Retry clears old enemies and bottles")
 	var reference: Node2D = load("res://Scenes/World.tscn").instantiate()

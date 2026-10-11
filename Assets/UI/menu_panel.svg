@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="508" viewBox="0 0 760 508">
+<defs><linearGradient id="charcoal" x2=".6" y2="1"><stop stop-color="#23231e" stop-opacity=".98"/><stop offset=".5" stop-color="#121410" stop-opacity=".98"/><stop offset="1" stop-color="#1c1c18" stop-opacity=".98"/></linearGradient><linearGradient id="rim" x2=".8" y2="1"><stop stop-color="#a09574"/><stop offset=".4" stop-color="#504d3d"/><stop offset=".7" stop-color="#7d7255"/><stop offset="1" stop-color="#33382c"/></linearGradient><pattern id="grain" width="31" height="27" patternUnits="userSpaceOnUse"><path d="M2 5h5M19 19h9M9 25h2" stroke="#bcb28f" stroke-opacity=".035"/><path d="M0 13h10M23 3h7" stroke="#000" stroke-opacity=".16"/></pattern></defs>
+<path d="M2 2H758V506H2Z" fill="url(#charcoal)" stroke="url(#rim)" stroke-width="2"/>
+<path d="M7 7H753V501H7Z" fill="url(#grain)" stroke="#747059" stroke-opacity=".35"/>
+<g fill="none" stroke="#ac9b6c" stroke-width="1" opacity=".8"><path d="M10 30V10H30M730 10H750V30M10 478V498H30M730 498H750V478"/><path d="M14 14L24 17 17 24Z M746 14L736 17 743 24Z M14 494L24 491 17 484Z M746 494L736 491 743 484Z"/></g>
+<path d="M34 3H180M580 505H725" stroke="#c2b18a" stroke-opacity=".35"/>
+</svg>

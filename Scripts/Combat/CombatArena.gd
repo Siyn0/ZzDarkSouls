@@ -4,6 +4,7 @@ const Tea := preload("res://Scripts/Combat/IcedTea.gd")
 const SmallEnemy := preload("res://Scenes/Enemies/SmallEnemy.tscn")
 const BossEnemy := preload("res://Scenes/Enemies/IronGuard.tscn")
 const Supplier := preload("res://Scripts/Combat/TeaSupplier.gd")
+const Vendor := preload("res://Scenes/NPCTriggers/TeaVendor.tscn")
 var mode := "mobs"
 var player: CharacterBody2D
 var supplier: Node2D
@@ -14,7 +15,6 @@ var _template := PackedScene.new()
 var _banner: Label
 var _stats: Label
 var _boss_bar: ProgressBar
-var _supplier_label: Label
 var _boss_name: Label
 var _arena_buttons: Array[Button] = []
 
@@ -39,45 +39,34 @@ func _ready() -> void:
 func _create_hud() -> void:
 	var screen: Control = $GameUI/Screen
 	_banner = Label.new()
-	_banner.position = Vector2(40, 177)
-	_banner.size = Vector2(870, 28)
-	_banner.add_theme_font_size_override("font_size", 18)
+	_banner.position = Vector2(320, 64)
+	_banner.size = Vector2(610, 56)
+	_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_banner.add_theme_font_size_override("font_size", 15)
 	_banner.modulate = Color("edcda0")
 	_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.add_child(_banner)
 	_stats = Label.new()
-	_stats.position = Vector2(470, 455)
-	_stats.size = Vector2(430, 46)
-	_stats.add_theme_font_size_override("font_size", 15)
+	_stats.position = Vector2(24, 454)
+	_stats.size = Vector2(195, 44)
+	_stats.add_theme_font_size_override("font_size", 13)
 	_stats.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.add_child(_stats)
 	_boss_bar = ProgressBar.new()
-	_boss_bar.position = Vector2(270, 235)
-	_boss_bar.size = Vector2(420, 8)
+	_boss_bar.position = Vector2(230, 476)
+	_boss_bar.size = Vector2(676, 16)
 	_boss_bar.show_percentage = false
-	_boss_bar.modulate = Color("d98574")
-	var bar_background := StyleBoxFlat.new()
-	bar_background.bg_color = Color("28323d")
-	var bar_fill := StyleBoxFlat.new()
-	bar_fill.bg_color = Color("e6c4b8")
-	_boss_bar.add_theme_stylebox_override("background", bar_background)
-	_boss_bar.add_theme_stylebox_override("fill", bar_fill)
+	var health_bar: ProgressBar = $GameUI.get_node("%Health")
+	_boss_bar.add_theme_stylebox_override("background", health_bar.get_theme_stylebox("background"))
+	_boss_bar.add_theme_stylebox_override("fill", health_bar.get_theme_stylebox("fill"))
 	screen.add_child(_boss_bar)
-	_boss_bar.set_deferred("size", Vector2(420, 8))
+	_boss_bar.set_deferred("size", Vector2(676, 16))
 	_boss_name = Label.new()
-	_boss_name.position = Vector2(270, 212)
-	_boss_name.size = Vector2(420, 22)
-	_boss_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_boss_name.add_theme_font_size_override("font_size", 14)
+	_boss_name.position = Vector2(232, 450)
+	_boss_name.size = Vector2(674, 22)
+	_boss_name.add_theme_font_size_override("font_size", 18)
 	_boss_name.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	screen.add_child(_boss_name)
-	_supplier_label = Label.new()
-	_supplier_label.position = Vector2(54, 326)
-	_supplier_label.text = "牢大\n无限续杯"
-	_supplier_label.add_theme_font_size_override("font_size", 14)
-	_supplier_label.modulate = Color("ddc387")
-	_supplier_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	screen.add_child(_supplier_label)
 	var titles := ["小怪练习", "Boss 空投战", "重试"]
 	for i in range(3):
 		var button := Button.new()
@@ -118,12 +107,12 @@ func reset_round() -> void:
 	player.combat.died.connect(_on_player_died)
 	completed = false
 	_respawn_left = 0
-	supplier = Supplier.new()
-	supplier.arena = self
-	supplier.flying = mode == "boss"
+	supplier = Supplier.new() if mode == "boss" else Vendor.instantiate()
+	if mode == "boss":
+		supplier.arena = self
+		supplier.flying = true
 	supplier.position = Vector2(-90, 274) if supplier.flying else Vector2(90, 416)
 	add_child(supplier)
-	_supplier_label.visible = mode == "mobs"
 	_boss_bar.visible = mode == "boss"
 	_boss_name.visible = mode == "boss"
 	if mode == "boss":
@@ -182,7 +171,7 @@ func _physics_process(delta: float) -> void:
 		_respawn_left -= delta
 		if _respawn_left <= 0:
 			_spawn_enemy()
-	_stats.text = "生命  %d / %d     架势  %d / %d\n%s" % [player.combat.health, player.combat.max_health, ceili(player.combat.guard), ceili(player.combat.max_guard), "抱着冰红茶：可以跳跃；防御会先放下瓶子" if player.combat.carrying() else "防御正面攻击；松开防御，架势恢复更快"]
+	_stats.text = "架势  %d / %d\n%s" % [ceili(player.combat.guard), ceili(player.combat.max_guard), "持有冰红茶" if player.combat.carrying() else ""]
 	for enemy in get_tree().get_nodes_in_group("enemies"):
 		if enemy.boss:
 			_boss_bar.max_value = enemy.max_health

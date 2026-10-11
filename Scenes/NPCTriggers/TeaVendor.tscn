@@ -1,0 +1,75 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/TeaVendor.gd" id="1_vendor"]
+[ext_resource type="Theme" path="res://Assets/UI/MenuTheme.tres" id="2_theme"]
+
+[sub_resource type="RectangleShape2D" id="Shape_proximity"]
+resource_local_to_scene = true
+size = Vector2(320, 160)
+
+[sub_resource type="StyleBoxFlat" id="Style_bubble"]
+bg_color = Color(0.045, 0.045, 0.035, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.48, 0.31, 1)
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 12.0
+content_margin_bottom = 12.0
+
+[node name="TeaVendor" type="Node2D"]
+z_index = 2
+texture_filter = 1
+script = ExtResource("1_vendor")
+
+[node name="Proximity" type="Area2D" parent="."]
+position = Vector2(0, -40)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Proximity"]
+shape = SubResource("Shape_proximity")
+
+[node name="TeaSpawn" type="Marker2D" parent="."]
+position = Vector2(44, -17)
+
+[node name="NameLabel" type="Label" parent="."]
+offset_left = -50.0
+offset_top = -78.0
+offset_right = 50.0
+offset_bottom = -56.0
+mouse_filter = 2
+theme = ExtResource("2_theme")
+theme_override_font_sizes/font_size = 14
+text = "牢大"
+horizontal_alignment = 1
+
+[node name="BubbleTail" type="Polygon2D" parent="."]
+visible = false
+z_index = 6
+position = Vector2(0, -96)
+polygon = PackedVector2Array(-7, 0, 7, 0, 0, 8)
+color = Color(0.55, 0.48, 0.31, 1)
+
+[node name="Bubble" type="PanelContainer" parent="."]
+visible = false
+z_index = 6
+offset_left = -150.0
+offset_top = -162.0
+offset_right = 150.0
+offset_bottom = -96.0
+mouse_filter = 2
+texture_filter = 2
+theme = ExtResource("2_theme")
+theme_override_styles/panel = SubResource("Style_bubble")
+
+[node name="Text" type="Label" parent="Bubble"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_font_sizes/font_size = 16
+text = "man！来点冰红茶吗？无限供应！"
+autowrap_mode = 3
+horizontal_alignment = 1

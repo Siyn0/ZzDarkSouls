@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/LevelCamera.gd" id="1_camera"]
+
+[node name="LevelCamera" type="Camera2D" groups=["level_camera"]]
+position = Vector2(480, 272)
+ignore_rotation = true
+script = ExtResource("1_camera")
