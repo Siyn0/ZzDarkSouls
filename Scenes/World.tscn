@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" path="res://Scenes/Player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://Scenes/GameUI.tscn" id="3_ui"]
 
+[ext_resource type="PackedScene" path="res://Scenes/LevelCamera.tscn" id="4_camera"]
+
 [node name="World" type="Node2D" unique_id=281675455]
 texture_filter = 1
 
@@ -27,3 +29,8 @@ jump_speed = 300.0
 gravity_scale = 3.15
 
 [node name="GameUI" parent="." unique_id=1309507838 instance=ExtResource("3_ui")]
+show_practice_link = true
+
+[node name="LevelCamera" parent="." node_paths=PackedStringArray("bounds_source") instance=ExtResource("4_camera")]
+use_bounds = true
+bounds_source = NodePath("../Ground")

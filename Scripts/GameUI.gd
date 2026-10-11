@@ -1,5 +1,9 @@
 extends CanvasLayer
 
+## 练习场使用的跳转入口；正式关卡默认隐藏，入口只出现在暂停菜单。
+@export var show_practice_link: bool = false
+## 默认使用简洁的条形显示；需要精确读数时可开启。
+@export var show_resource_numbers: bool = false
 var _binding_buttons: Dictionary = {}
 var _listening_action: String = ""
 var _listening_slot: int = 0
@@ -9,11 +13,12 @@ var _was_paused: bool = false
 @onready var main_page: Control = %MainPage
 @onready var bindings_page: Control = %BindingsPage
 @onready var status_label: Label = %Status
-@onready var player: CharacterBody2D = get_parent().get_node("Player")
+var player: CharacterBody2D
 
 
 func _ready() -> void:
-	%SettingsButton.pressed.connect(open_settings)
+	%HealthLabel.visible = show_resource_numbers
+	%StaminaLabel.visible = show_resource_numbers
 	%CloseButton.pressed.connect(close_settings)
 	%ResumeButton.pressed.connect(close_settings)
 	%OpenBindings.pressed.connect(show_bindings)
@@ -23,9 +28,8 @@ func _ready() -> void:
 	%GrabMode.add_item("按一下切换")
 	%GrabMode.item_selected.connect(_change_grab_mode)
 	%ArenaButton.pressed.connect(_switch_arena)
+	%ArenaButton.visible = show_practice_link
 	%ArenaButton.text = "返回练习场" if get_parent().has_method("is_combat_arena") else "战斗试验场"
-	if get_parent().has_method("is_combat_arena"):
-		$Screen/Title.text = "ICED TEA / 冰红茶试验场"
 	for action: String in KeyBindings.ACTION_LABELS:
 		var label := Label.new()
 		label.text = KeyBindings.ACTION_LABELS[action]
@@ -44,15 +48,36 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+	%Vitals.visible = is_instance_valid(player)
+	if not is_instance_valid(player):
+		%RegionHint.hide()
+		return
+	%Health.max_value = player.combat.max_health
+	%Health.value = player.combat.health
+	%HealthLabel.text = "生命  %d / %d" % [player.combat.health, player.combat.max_health]
 	%Stamina.max_value = player.max_stamina
 	%Stamina.value = player.stamina
 	var tired: bool = player.stamina < player.tired_threshold
-	%Stamina.modulate = Color(1.0, 0.45, 0.3) if tired else Color(0.5, 0.9, 0.8)
 	%StaminaLabel.text = "体力  %d / %d%s" % [ceili(maxf(0.0, player.stamina)), ceili(player.max_stamina), "  · 即将力竭" if tired else ""]
-	%DashStatus.text = "◇ 放下冰红茶才能冲刺" if player.combat.carrying() else "◆ 冲刺就绪" if player.dash_available() else "◇ 冲刺恢复中" if player.is_on_floor() else "◇ 落地恢复冲刺"
+	
+	_update_region_hint()
+
+
+func _update_region_hint() -> void:
+	var chosen: Area2D
+	for area: Area2D in get_tree().get_nodes_in_group("text_hint_areas"):
+		if not area.enabled or area.message.strip_edges().is_empty() or not area.overlaps_body(player):
+			continue
+		if chosen == null or area.hint_priority > chosen.hint_priority or (area.hint_priority == chosen.hint_priority and area.entered_frame >= chosen.entered_frame):
+			chosen = area
+	%RegionHint.visible = chosen != null
+	%HintText.text = chosen.message if chosen != null else ""
 
 
 func _switch_arena() -> void:
+	close_settings()
 	KeyBindings.release_gameplay_inputs()
 	get_tree().change_scene_to_file("res://Scenes/World.tscn" if get_parent().has_method("is_combat_arena") else "res://Scenes/CombatArena.tscn")
 
@@ -93,7 +118,6 @@ func open_settings() -> void:
 	get_tree().paused = true
 	KeyBindings.release_gameplay_inputs()
 	overlay.show()
-	%SettingsButton.hide()
 	show_main_page()
 
 
@@ -102,7 +126,6 @@ func close_settings() -> void:
 		return
 	_stop_listening()
 	overlay.hide()
-	%SettingsButton.show()
 	_release_focus()
 	KeyBindings.release_gameplay_inputs()
 	get_tree().paused = _was_paused
@@ -154,34 +177,18 @@ func _refresh_bindings() -> void:
 		for slot in range(2):
 			var button: Button = _binding_buttons[action][slot]
 			button.text = "等待按键…" if action == _listening_action and slot == _listening_slot else KeyBindings.key_label(KeyBindings.get_key(action, slot))
-	%Controls.text = "移动 %s · %s    跳跃 %s（长按跳更高）    冲刺 %s\n按住 %s 抓墙，%s / %s 上下攀爬；抓墙 + 跳跃向上跳\n方向 + 冲刺：八向闪身    向下：地面蹲下 / 空中达到普通落速后快落    Esc 设置\n技巧：贴墙松开左右起跳，再按回墙面；水平 / 斜下冲刺后延迟起跳" % [
-		KeyBindings.action_label("move_left"), KeyBindings.action_label("move_right"),
-		KeyBindings.action_label("jump"), KeyBindings.action_label("dash"),
-		KeyBindings.action_label("grab"), KeyBindings.action_label("aim_up"),
-		KeyBindings.action_label("aim_down"),
-	]
-	if KeyBindings.grab_mode == "toggle":
-		%Controls.text = %Controls.text.replace("按住 %s 抓墙" % KeyBindings.action_label("grab"), "按 %s 切换抓墙" % KeyBindings.action_label("grab"))
-	if get_parent().has_method("is_combat_arena"):
-		var grab_hint := "按 %s 切换抓取 / 松手；松手时按向下则放下" if KeyBindings.grab_mode == "toggle" else "按住 %s 抓墙 / 抓冰红茶；松开投掷，向下 + 松开放下"
-		%Controls.text = "移动 %s · %s    跳跃 %s    冲刺 %s\n%s\n按住 %s 防御；看刀刃落到身上时按下：精准防御\n抱着冰红茶可以跳跃；先抛出再冲刺 / 抓墙。右下角切换小怪与 Boss 战。" % [
-			KeyBindings.action_label("move_left"), KeyBindings.action_label("move_right"),
-			KeyBindings.action_label("jump"), KeyBindings.action_label("dash"),
-			grab_hint % KeyBindings.action_label("grab"),
-			KeyBindings.action_label("defend"),
-		]
 
 
 func _change_grab_mode(index: int) -> void:
 	var error := KeyBindings.set_grab_mode("toggle" if index == 1 else "hold")
 	%GrabModeStatus.text = "抓取方式已保存，抓墙与冰红茶共用。" if error.is_empty() else error
-	%GrabModeStatus.modulate = Color(0.55, 0.84, 0.86) if error.is_empty() else Color(1.0, 0.68, 0.58)
+	%GrabModeStatus.modulate = Color(0.85, 0.79, 0.61) if error.is_empty() else Color(1.0, 0.68, 0.58)
 	%GrabMode.select(1 if KeyBindings.grab_mode == "toggle" else 0)
 
 
 func _set_status(message: String, is_error: bool = false) -> void:
 	status_label.text = message
-	status_label.modulate = Color(1.0, 0.68, 0.58) if is_error else Color(0.55, 0.84, 0.86)
+	status_label.modulate = Color(1.0, 0.68, 0.58) if is_error else Color(0.85, 0.79, 0.61)
 
 
 func _release_focus() -> void:
