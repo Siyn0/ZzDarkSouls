@@ -101,8 +101,11 @@ func _update_grab() -> void:
 			_grab_release_armed = true
 		elif _grab_release_armed:
 			throw_tea(Input.is_action_pressed("aim_down"))
-	elif grabbing and not guarding and actor.get("_dash_time_left") <= 0:
+	elif grabbing and not guarding:
 		# 提前按住抓取再靠近瓶子也能拾取；与抓墙共享同一逻辑状态。
+		# 同一帧按冲刺 + 抓取时先启动冲刺，下一帧再接住，保留已有动量。
+		if Input.is_action_just_pressed("dash") and actor.dash_available():
+			return
 		if try_pick_up(false):
 			_grab_release_armed = true
 
@@ -184,9 +187,28 @@ func receive_attack(source: Node2D, attack_id: int, damage: int) -> String:
 	if health <= 0:
 		dead = true
 		guarding = false
-		feedback.emit("倒下了。点击「重试」再来一次")
+		feedback.emit("倒下了……即将回到复活点")
 		died.emit()
 	return "hurt"
+
+func reset_for_respawn() -> void:
+	throw_tea(true)
+	held_tea = null
+	health = max_health
+	guard = max_guard
+	dead = false
+	guarding = false
+	perfect_left = 0.0
+	rearm_left = 0.0
+	invulnerable_left = 0.0
+	hitstun_left = 0.0
+	guard_recovery_left = 0.0
+	flash_left = 0.0
+	last_result = ""
+	_seen_attacks.clear()
+	_grab_release_armed = false
+	_input_reset_serial = KeyBindings.input_reset_serial
+	queue_redraw()
 
 func _cancel_movement() -> void:
 	actor._dash_time_left = 0

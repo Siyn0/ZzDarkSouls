@@ -61,15 +61,33 @@ var alive := true
 var swing_elapsed := 0.0
 var _swing_hit := false
 var _target_search_left := 0.0
+var _spawn_position := Vector2.ZERO
 
 func _ready() -> void:
 	_refresh_preview()
 	if Engine.is_editor_hint():
 		return
 	add_to_group("enemies")
+	add_to_group("respawn_reset")
+	_spawn_position = global_position
 	health = max_health
 	phase_left = initial_attack_delay
 	_find_target()
+
+func reset_after_player_respawn() -> void:
+	if not alive:
+		return
+	global_position = _spawn_position
+	velocity = Vector2.ZERO
+	health = max_health
+	posture = 0.0
+	phase = "approach"
+	phase_left = initial_attack_delay
+	swing_elapsed = 0.0
+	_swing_hit = false
+	hit_flash = 0.0
+	attack_id += 1
+	queue_redraw()
 
 func _refresh_preview() -> void:
 	if not is_node_ready():

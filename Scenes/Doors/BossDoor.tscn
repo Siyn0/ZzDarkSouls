@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Doors/TriggerDoor.tscn" id="1_door"]
+[ext_resource type="Script" path="res://Scripts/Doors/BossDoor.gd" id="2_boss"]
+
+[node name="BossDoor" instance=ExtResource("1_door")]
+script = ExtResource("2_boss")
+starts_open = false
+
+[node name="CollisionShape2D" parent="Blocker" index="0"]
+disabled = false

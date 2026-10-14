@@ -135,6 +135,31 @@ func dash_available() -> bool:
 	return not _air_dash_used and _dash_cooldown_left <= 0.0 and not combat.carrying() and not combat.dead
 
 
+func reset_for_respawn(at: Vector2) -> void:
+	combat.reset_for_respawn()
+	global_position = at
+	velocity = Vector2.ZERO
+	_set_ducking(false)
+	is_climbing = false
+	stamina = max_stamina
+	# 清除所有动作窗口，防止死亡前的蹬墙 / 冲刺 / 蓄跳在复活后继续执行。
+	for property: String in ["_climb_wait", "_regrab_lock", "_coyote_left", "_jump_buffer_left",
+		"_variable_jump_left", "_force_move_left", "_wall_boost_left", "_wall_boost_refund",
+		"_wall_retention_left", "_wall_retained_speed", "_dash_attack_left", "_dash_buffer_left",
+		"_dash_time_left", "_dash_pause_left", "_dash_cooldown_left", "_dash_refill_left",
+		"_afterimage_time_left", "_tired_flash_elapsed"]:
+		set(property, 0.0)
+	_dash_velocity = Vector2.ZERO
+	_dash_direction = Vector2.RIGHT
+	_dash_started_on_ground = false
+	_dash_sliding = false
+	_air_dash_used = false
+	_fall_speed_limit = max_fall_speed
+	_wall_slide_left = wall_slide_time
+	_face(1)
+	sprite.modulate = _normal_modulate
+
+
 func _process(delta: float) -> void:
 	# 集中计算角色颜色，避免冲刺结束或受击打断时覆盖资源状态提示。
 	var tint := Color.WHITE
@@ -439,7 +464,7 @@ func _update_dash(delta: float, grounded: bool) -> void:
 			return
 	if grounded and _dash_direction.y > 0.0 and _dash_direction.x != 0.0:
 		_dash_slide()
-	if _jump_buffer_left > 0.0 and _can_stand():
+	if _jump_buffer_left > 0.0 and _can_stand() and not combat.carrying():
 		if _coyote_left > 0.0 and _dash_direction.y == 0.0:
 			_super_jump()
 			_move_player(delta)

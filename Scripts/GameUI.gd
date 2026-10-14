@@ -1,5 +1,10 @@
 extends CanvasLayer
 
+signal settings_closed
+
+## 主菜单复用设置页时隐藏游戏 HUD，并把返回按钮显示为返回主菜单。
+@export var menu_mode := false
+
 ## 练习场使用的跳转入口；正式关卡默认隐藏，入口只出现在暂停菜单。
 @export var show_practice_link: bool = false
 ## 默认使用简洁的条形显示；需要精确读数时可开启。
@@ -8,6 +13,7 @@ var _binding_buttons: Dictionary = {}
 var _listening_action: String = ""
 var _listening_slot: int = 0
 var _was_paused: bool = false
+var _save_notice_left := 0.0
 
 @onready var overlay: Control = %Overlay
 @onready var main_page: Control = %MainPage
@@ -17,6 +23,13 @@ var player: CharacterBody2D
 
 
 func _ready() -> void:
+	$Screen/PauseHint.visible = not menu_mode
+	%MainMenuButton.visible = not menu_mode
+	%MainMenuButton.pressed.connect(_return_to_menu)
+	SaveGame.save_failed.connect(_show_save_error)
+	if menu_mode:
+		%ResumeButton.text = "返回主菜单"
+		%MainPage.get_node("Description").text = "按自己的习惯调整操作，修改后自动保存。"
 	%HealthLabel.visible = show_resource_numbers
 	%StaminaLabel.visible = show_resource_numbers
 	%CloseButton.pressed.connect(close_settings)
@@ -48,6 +61,12 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	_save_notice_left = maxf(0, _save_notice_left - _delta)
+	%SaveNotice.visible = _save_notice_left > 0
+	if menu_mode:
+		%Vitals.hide()
+		%RegionHint.hide()
+		return
 	if not is_instance_valid(player):
 		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
 	%Vitals.visible = is_instance_valid(player)
@@ -80,6 +99,15 @@ func _switch_arena() -> void:
 	close_settings()
 	KeyBindings.release_gameplay_inputs()
 	get_tree().change_scene_to_file("res://Scenes/World.tscn" if get_parent().has_method("is_combat_arena") else "res://Scenes/CombatArena.tscn")
+
+func _show_save_error(message: String) -> void:
+	%SaveNotice.text = message
+	_save_notice_left = 6.0
+
+func _return_to_menu() -> void:
+	var error := SaveGame.return_to_menu()
+	if not error.is_empty():
+		_show_save_error(error)
 
 
 func _input(event: InputEvent) -> void:
@@ -129,6 +157,7 @@ func close_settings() -> void:
 	_release_focus()
 	KeyBindings.release_gameplay_inputs()
 	get_tree().paused = _was_paused
+	settings_closed.emit()
 
 
 func show_main_page() -> void:

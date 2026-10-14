@@ -68,7 +68,9 @@ func run_checks() -> void:
 	npc.position = Vector2(200, 400)
 	container.add_child(npc)
 	await seconds(2)
-	check(is_instance_valid(npc.stock) and npc.stock.global_position.distance_to(Vector2(5244, 1388)) < 3, "Supplier works under translated parents and far beyond the old arena coordinate limits")
+	# 按当前瓶子大小检查底部落在地面；原来的 1388 写死了缩放前的半高。
+	var floor_y: float = npc.stock.global_position.y + 12 * npc.stock.size_multiplier if is_instance_valid(npc.stock) else INF
+	check(is_instance_valid(npc.stock) and absf(npc.stock.global_position.x - 5244) < 3 and absf(floor_y - 1400) < 3, "Supplier works under translated parents and far beyond the old arena coordinate limits")
 	var far_stock: Node2D = npc.stock
 	await seconds(2)
 	check(npc.stock == far_stock and get_nodes_in_group("tea_bottles").size() == 1, "Stock in a distant level remains stable without endless delete/respawn loops")

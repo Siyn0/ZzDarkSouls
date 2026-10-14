@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_player"]
 [ext_resource type="Texture2D" path="res://Assets/Player/knight.svg" id="2_knight"]
 [ext_resource type="Script" path="res://Scripts/Combat/PlayerCombat.gd" id="3_combat"]
+[ext_resource type="Script" path="res://Scripts/PlayerRespawn.gd" id="4_respawn"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 10.0
@@ -25,3 +26,6 @@ shape = SubResource("CapsuleShape2D_player")
 
 [node name="Combat" type="Node2D" parent="."]
 script = ExtResource("3_combat")
+
+[node name="Respawn" type="Node" parent="."]
+script = ExtResource("4_respawn")

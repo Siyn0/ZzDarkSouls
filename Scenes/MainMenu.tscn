@@ -1,0 +1,94 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/MainMenu.gd" id="1_menu"]
+[ext_resource type="Theme" path="res://Assets/UI/MenuTheme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://Scenes/GameUI.tscn" id="3_settings"]
+
+[sub_resource type="SystemFont" id="Font_title"]
+font_names = PackedStringArray("Times New Roman", "Liberation Serif", "Noto Serif")
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_menu")
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_top = 0.17
+anchor_right = 1.0
+anchor_bottom = 0.4
+offset_left = 20.0
+offset_right = -20.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.92, 0.92, 0.89, 1)
+theme_override_fonts/font = SubResource("Font_title")
+theme_override_font_sizes/font_size = 82
+text = "ZZ DARK SOULS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.57
+anchor_right = 0.5
+offset_left = -175.0
+offset_right = 175.0
+grow_horizontal = 2
+theme_override_constants/separation = 4
+
+[node name="Start" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "开始游戏"
+
+[node name="Load" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "加载存档"
+
+[node name="Settings" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "设置"
+
+[node name="Quit" type="Button" parent="Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(350, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "退出游戏"
+
+[node name="Status" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -52.0
+offset_right = -24.0
+offset_bottom = -12.0
+grow_vertical = 0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.78, 0.65, 0.45, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="SettingsUI" parent="." instance=ExtResource("3_settings")]
+menu_mode = true

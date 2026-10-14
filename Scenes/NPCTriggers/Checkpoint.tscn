@@ -1,0 +1,46 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Checkpoint.gd" id="1_checkpoint"]
+[ext_resource type="Texture2D" path="res://Assets/IMG/Fire.png" id="2_fire"]
+
+[sub_resource type="RectangleShape2D" id="Shape_activation"]
+resource_local_to_scene = true
+size = Vector2(88, 80)
+
+[node name="Checkpoint" type="Area2D"]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_checkpoint")
+
+[node name="ActiveGlow" type="Polygon2D" parent="."]
+visible = false
+position = Vector2(0, -4)
+polygon = PackedVector2Array(-32, 0, -20, -5, 20, -5, 32, 0, 20, 5, -20, 5)
+color = Color(1, 0.5, 0.12, 0.3)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(0.65, 0.65)
+texture = ExtResource("2_fire")
+centered = false
+offset = Vector2(-40, -110)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -40)
+shape = SubResource("Shape_activation")
+
+[node name="Notice" type="Label" parent="."]
+visible = false
+offset_left = -100.0
+offset_top = -99.5
+offset_right = 100.0
+offset_bottom = -75.5
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.48, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+text = "篝火已激活"
+horizontal_alignment = 1
