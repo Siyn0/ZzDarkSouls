@@ -11,7 +11,12 @@ func _initialize() -> void:
 	if not OS.get_cmdline_user_args().is_empty():
 		rate = int(OS.get_cmdline_user_args()[0])
 	Engine.physics_ticks_per_second = rate
-	call_deferred("run_checks")
+	call_deferred("_prepare_checks")
+
+func _prepare_checks() -> void:
+	# 通用回归测试不会读写玩家的正式进度存档。
+	root.get_node("SaveGame").auto_save_enabled = false
+	run_checks()
 
 func check(condition: bool, description: String) -> void:
 	checks += 1

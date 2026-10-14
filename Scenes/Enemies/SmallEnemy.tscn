@@ -1,28 +1,26 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://cwdi6aik3vaim"]
 
-[ext_resource type="Script" path="res://Scripts/Combat/TrainingEnemy.gd" id="1_enemy"]
+[ext_resource type="Script" uid="uid://dba0higppyr3b" path="res://Scripts/Combat/TrainingEnemy.gd" id="1_enemy"]
 
-[sub_resource type="RectangleShape2D" id="Shape_enemy"]
-resource_local_to_scene = true
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nf5tu"]
 size = Vector2(26, 42)
 
-[node name="SmallEnemy" type="CharacterBody2D" groups=["enemies"]]
+[node name="SmallEnemy" type="CharacterBody2D" unique_id=200960794 groups=["enemies"]]
 z_index = 2
 texture_filter = 1
 collision_layer = 4
-collision_mask = 1
 script = ExtResource("1_enemy")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=469780650]
 position = Vector2(0, -21)
-shape = SubResource("Shape_enemy")
+shape = SubResource("RectangleShape2D_nf5tu")
 
-[node name="NameLabel" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="." unique_id=1767048860]
+visible = false
 offset_left = -90.0
 offset_top = -96.0
 offset_right = 90.0
 offset_bottom = -76.0
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.88, 1)
 theme_override_colors/font_outline_color = Color(0.06, 0.08, 0.1, 1)
 theme_override_constants/outline_size = 3

@@ -105,6 +105,7 @@ func reset_round() -> void:
 	$GameUI.player = player
 	player.combat.feedback.connect(announce)
 	player.combat.died.connect(_on_player_died)
+	player.get_node("Respawn").respawned.connect(_on_player_respawned)
 	completed = false
 	_respawn_left = 0
 	supplier = Supplier.new() if mode == "boss" else Vendor.instantiate()
@@ -158,6 +159,12 @@ func _on_player_died() -> void:
 	_respawn_left = 0
 	if is_instance_valid(supplier):
 		supplier.active = false
+
+func _on_player_respawned() -> void:
+	if is_instance_valid(supplier):
+		supplier.active = not completed
+	if mode == "mobs" and get_tree().get_nodes_in_group("enemies").is_empty():
+		_spawn_enemy()
 
 func announce(message: String, duration: float = 2.5) -> void:
 	_banner.text = message
